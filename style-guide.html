@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Taxis - Style Guide</title>
+	<link rel="stylesheet" href="styles.css?v=3">
+	<style>
+		/* Style Guide Specific Styles */
+		.style-guide {
+			max-width: 1200px;
+			margin: 0 auto;
+			padding: 2rem;
+		}
+
+		.section {
+			margin-bottom: 3rem;
+			padding: 2rem;
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 16px;
+			backdrop-filter: blur(10px);
+			border: 1px solid rgba(255, 255, 255, 0.2);
+		}
+
+		.section h2 {
+			color: #2c3e50;
+			font-size: 1.8rem;
+			font-weight: 700;
+			margin-bottom: 1.5rem;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			border-bottom: 3px solid #667eea;
+			padding-bottom: 0.5rem;
+		}
+
+		.color-palette {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1.5rem;
+			margin-bottom: 2rem;
+		}
+
+		.color-card {
+			padding: 1.5rem;
+			border-radius: 12px;
+			text-align: center;
+			color: white;
+			font-weight: 600;
+			box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+		}
+
+		.color-card h3 {
+			margin-bottom: 0.5rem;
+			font-size: 1.1rem;
+		}
+
+		.color-code {
+			font-family: 'Courier New', monospace;
+			font-size: 0.9rem;
+			opacity: 0.9;
+		}
+
+		.typography-examples {
+			display: grid;
+			gap: 1rem;
+		}
+
+		.typography-item {
+			padding: 1rem;
+			border-left: 4px solid #667eea;
+			background: rgba(102, 126, 234, 0.05);
+			border-radius: 0 8px 8px 0;
+		}
+
+		.typography-item h4 {
+			color: #2c3e50;
+			margin-bottom: 0.5rem;
+			font-size: 0.9rem;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		.component-showcase {
+			display: grid;
+			gap: 2rem;
+		}
+
+		.component-section {
+			padding: 1.5rem;
+			border: 2px solid rgba(102, 126, 234, 0.1);
+			border-radius: 12px;
+			background: rgba(255, 255, 255, 0.5);
+		}
+
+		.component-section h4 {
+			color: #2c3e50;
+			margin-bottom: 1rem;
+			font-weight: 600;
+		}
+
+		.button-group {
+			display: flex;
+			gap: 1rem;
+			flex-wrap: wrap;
+			align-items: center;
+		}
+
+		.input-showcase {
+			display: grid;
+			gap: 1rem;
+			max-width: 400px;
+		}
+
+		.result-showcase {
+			display: grid;
+			gap: 0.5rem;
+			max-width: 400px;
+		}
+
+		.navigation {
+			text-align: center;
+			margin-bottom: 2rem;
+		}
+
+		.navigation a {
+			color: white;
+			text-decoration: none;
+			font-weight: 600;
+			padding: 0.5rem 1rem;
+			border-radius: 8px;
+			background: rgba(255, 255, 255, 0.2);
+			backdrop-filter: blur(10px);
+			transition: all 0.3s ease;
+		}
+
+		.navigation a:hover {
+			background: rgba(255, 255, 255, 0.3);
+			transform: translateY(-2px);
+		}
+	</style>
+</head>
+
+<body>
+	<header>
+		<h1>Taxis Style Guide</h1>
+		<p>Design System & Visual Components</p>
+	</header>
+
+	<div class="navigation">
+		<a href="index.html">← Back to Tax Calculator</a>
+	</div>
+
+	<div class="style-guide">
+		<!-- Color Palette Section -->
+		<section class="section">
+			<h2>Color Palette</h2>
+			<div class="color-palette">
+				<div class="color-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+					<h3>Primary Gradient</h3>
+					<div class="color-code">#667eea → #764ba2</div>
+				</div>
+				<div class="color-card" style="background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);">
+					<h3>Success Gradient</h3>
+					<div class="color-code">#56ab2f → #a8e6cf</div>
+				</div>
+				<div class="color-card" style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);">
+					<h3>Danger Gradient</h3>
+					<div class="color-code">#ff6b6b → #ee5a24</div>
+				</div>
+				<div class="color-card" style="background: #2c3e50; color: white;">
+					<h3>Text Primary</h3>
+					<div class="color-code">#2c3e50</div>
+				</div>
+				<div class="color-card" style="background: rgba(255, 255, 255, 0.95); color: #2c3e50;">
+					<h3>Card Background</h3>
+					<div class="color-code">rgba(255, 255, 255, 0.95)</div>
+				</div>
+				<div class="color-card" style="background: rgba(102, 126, 234, 0.1); color: #2c3e50;">
+					<h3>Accent Light</h3>
+					<div class="color-code">rgba(102, 126, 234, 0.1)</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Typography Section -->
+		<section class="section">
+			<h2>Typography</h2>
+			<div class="typography-examples">
+				<div class="typography-item">
+					<h4>Main Heading (H1)</h4>
+					<div
+						style="font-size: 2.5rem; font-weight: 700; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);">
+						Taxis</div>
+				</div>
+				<div class="typography-item">
+					<h4>Subheading (H2)</h4>
+					<div
+						style="font-size: 1.8rem; font-weight: 700; color: #2c3e50; text-transform: uppercase; letter-spacing: 1px;">
+						Section Title</div>
+				</div>
+				<div class="typography-item">
+					<h4>Section Header (H3)</h4>
+					<div
+						style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; text-transform: uppercase; letter-spacing: 0.5px;">
+						INPUTS</div>
+				</div>
+				<div class="typography-item">
+					<h4>Body Text</h4>
+					<div style="font-size: 1rem; color: #2c3e50; line-height: 1.6;">This is regular body text with good
+						readability and proper line height for comfortable reading experience.</div>
+				</div>
+				<div class="typography-item">
+					<h4>Label Text</h4>
+					<div style="font-weight: 600; color: #2c3e50;">Filing Status:</div>
+				</div>
+				<div class="typography-item">
+					<h4>Highlighted Results</h4>
+					<div style="font-size: 1.2rem; font-weight: 700; color: #56ab2f;">$45,230</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Component Showcase -->
+		<section class="section">
+			<h2>Component Showcase</h2>
+			<div class="component-showcase">
+
+				<!-- Buttons -->
+				<div class="component-section">
+					<h4>Buttons</h4>
+					<div class="button-group">
+						<button class="btn btn-primary">+ Add Scenario</button>
+						<button class="btn">Duplicate</button>
+						<button class="btn btn-danger">Delete</button>
+						<button class="btn btn-small">Small Button</button>
+					</div>
+				</div>
+
+				<!-- Form Inputs -->
+				<div class="component-section">
+					<h4>Form Inputs</h4>
+					<div class="input-showcase">
+						<div class="input-group">
+							<label>Filing Status:</label>
+							<select>
+								<option>Single</option>
+								<option>Married Filing Jointly</option>
+								<option>Married Filing Separately</option>
+							</select>
+						</div>
+						<div class="input-group">
+							<label>Ordinary Income:</label>
+							<input type="text" value="50000" placeholder="Enter amount">
+						</div>
+						<div class="input-group">
+							<label>65+:</label>
+							<input type="checkbox" checked>
+						</div>
+						<div class="input-group">
+							<label>Capital Gains:</label>
+							<input type="text" value="15000" placeholder="Enter amount">
+						</div>
+					</div>
+				</div>
+
+				<!-- Results Display -->
+				<div class="component-section">
+					<h4>Results Display</h4>
+					<p style="margin-bottom: 1rem; color: #666; font-size: 0.9rem;">
+						<strong>Spacing Guidelines:</strong> Tight vertical spacing (0.25rem gap) for compact display.
+						Right-aligned values with minimum 100px width for consistent column alignment.
+						Subtle vertical guide line provides visual alignment hint.
+					</p>
+					<div class="result-showcase">
+						<div class="results-grid" style="position: relative;">
+							<div class="result-item">
+								<label>Standard Deduction:</label>
+								<span>$13,850</span>
+							</div>
+							<div class="result-item">
+								<label>Taxable Income:</label>
+								<span>$36,150</span>
+							</div>
+							<div class="result-item">
+								<label>Ordinary Tax:</label>
+								<span>$4,140</span>
+							</div>
+							<div class="result-item highlight">
+								<label>Total Tax:</label>
+								<span>$4,140</span>
+							</div>
+							<div class="result-item highlight">
+								<label>Effective Rate:</label>
+								<span>8.28%</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Scenario Card -->
+				<div class="component-section">
+					<h4>Scenario Card</h4>
+					<div class="scenario-card" style="max-width: 400px;">
+						<div class="scenario-header">
+							<input type="text" class="scenario-name" value="Sample Scenario">
+							<div class="scenario-actions">
+								<button class="btn btn-small">Duplicate</button>
+								<button class="btn btn-small btn-danger">Delete</button>
+							</div>
+						</div>
+
+						<div class="scenario-inputs">
+							<h3>Inputs</h3>
+							<div class="input-group">
+								<label>Filing Status:</label>
+								<select>
+									<option>Single</option>
+								</select>
+							</div>
+							<div class="input-group">
+								<label>Ordinary Income:</label>
+								<input type="text" value="50000">
+							</div>
+						</div>
+
+						<div class="scenario-results">
+							<h3>Results</h3>
+							<div class="result-item highlight">
+								<label>Total Tax:</label>
+								<span>$4,140</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Layout & Spacing Guidelines -->
+		<section class="section">
+			<h2>Layout & Spacing Guidelines</h2>
+			<div class="component-showcase">
+				<div class="component-section">
+					<h4>Results Grid Spacing</h4>
+					<p style="margin-bottom: 1rem; color: #666;">
+						<strong>Vertical Spacing:</strong> Use 0.25rem gap between result items for tight, compact
+						display.<br>
+						<strong>Padding:</strong> 0.375rem vertical padding on regular items, 0.75rem on highlighted
+						items.<br>
+						<strong>Hover State:</strong> Maintain consistent padding with horizontal extension (0.5rem
+						sides).
+					</p>
+				</div>
+
+				<div class="component-section">
+					<h4>Column Alignment</h4>
+					<p style="margin-bottom: 1rem; color: #666;">
+						<strong>Value Alignment:</strong> Right-align all numeric values with minimum 100px width.<br>
+						<strong>Visual Guide:</strong> Subtle vertical guide line (1px, 8% opacity) positioned 100px
+						from right edge.<br>
+						<strong>Label Flex:</strong> Labels use flex: 1 to fill available space, pushing values to
+						consistent right position.
+					</p>
+					<div
+						style="background: rgba(102, 126, 234, 0.05); padding: 1rem; border-radius: 8px; position: relative;">
+						<div
+							style="position: absolute; right: 100px; top: 0; bottom: 0; width: 1px; background: rgba(102, 126, 234, 0.2);">
+						</div>
+						<div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+							<span>Label Text</span>
+							<span style="min-width: 100px; text-align: right; font-weight: 600;">$12,345</span>
+						</div>
+						<div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+							<span>Longer Label Text</span>
+							<span style="min-width: 100px; text-align: right; font-weight: 600;">$567</span>
+						</div>
+						<div style="display: flex; justify-content: space-between;">
+							<span>Very Long Label Text</span>
+							<span style="min-width: 100px; text-align: right; font-weight: 600;">$89,012</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- Visual Effects -->
+		<section class="section">
+			<h2>Visual Effects</h2>
+			<div class="component-showcase">
+				<div class="component-section">
+					<h4>Glassmorphism Cards</h4>
+					<div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+						<div
+							style="padding: 1.5rem; background: rgba(255, 255, 255, 0.95); border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);">
+							<h5 style="margin-bottom: 0.5rem; color: #2c3e50;">Semi-transparent</h5>
+							<p style="color: #2c3e50; font-size: 0.9rem;">Backdrop blur effect</p>
+						</div>
+						<div
+							style="padding: 1.5rem; background: rgba(102, 126, 234, 0.1); border-radius: 16px; backdrop-filter: blur(10px); border: 1px solid rgba(102, 126, 234, 0.2);">
+							<h5 style="margin-bottom: 0.5rem; color: #2c3e50;">Accent Tinted</h5>
+							<p style="color: #2c3e50; font-size: 0.9rem;">Subtle color overlay</p>
+						</div>
+					</div>
+				</div>
+
+				<div class="component-section">
+					<h4>Hover Effects</h4>
+					<div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+						<div style="padding: 1.5rem; background: rgba(255, 255, 255, 0.95); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); transition: all 0.3s ease; cursor: pointer;"
+							onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 40px rgba(0, 0, 0, 0.15)'"
+							onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 32px rgba(0, 0, 0, 0.1)'">
+							<h5 style="margin-bottom: 0.5rem; color: #2c3e50;">Hover Me</h5>
+							<p style="color: #2c3e50; font-size: 0.9rem;">Elevation on hover</p>
+						</div>
+						<button class="btn" style="margin: 0;">Hover Button</button>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+</body>
+
+</html>

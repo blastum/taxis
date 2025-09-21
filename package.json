@@ -1,0 +1,23 @@
+{
+	"name": "taxis",
+	"version": "1.0.0",
+	"description": "Tax Scenario Calculator - A simplified tax scenario calculator for comparing different tax situations",
+	"main": "dist/main.js",
+	"scripts": {
+		"build": "tsc",
+		"watch": "tsc --watch",
+		"serve": "python3 -m http.server 8000",
+		"dev": "tsc --watch & python3 -m http.server 8000"
+	},
+	"keywords": [
+		"tax",
+		"calculator",
+		"scenario",
+		"finance"
+	],
+	"author": "Your Name",
+	"license": "MIT",
+	"devDependencies": {
+		"typescript": "^5.0.0"
+	}
+}
