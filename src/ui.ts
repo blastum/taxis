@@ -5,7 +5,7 @@ export class UIManager {
 	private scenarioManager: ScenarioManager
 	private scenariosContainer: HTMLElement
 	private initialFocusDone: boolean = false
-	
+
 	// Configuration: Enable focus preservation during real-time updates
 	// When true: Uses silent updates to prevent focus loss during typing
 	// When false: Uses normal updates with full re-renders (may cause focus loss)
@@ -367,13 +367,13 @@ export class UIManager {
 			this.scenarioManager.updateScenario(id, { name: nameInput.value })
 		})
 
-		// Force scenario name to go to ordinary income on Tab/Enter
+		// Force scenario name to go to ordinary income on Tab/Enter (less aggressive)
 		nameInput.addEventListener('keydown', (e) => {
 			if ((e as KeyboardEvent).key === 'Tab' || (e as KeyboardEvent).key === 'Enter') {
 				e.preventDefault()
 				const ordinaryIncomeField = card.querySelector('[data-field="ordinaryIncome"]') as HTMLElement
 				if (ordinaryIncomeField) {
-					ordinaryIncomeField.focus()
+					setTimeout(() => ordinaryIncomeField.focus(), 10)
 				}
 			}
 		})
@@ -438,36 +438,36 @@ export class UIManager {
 		tabOrder.forEach((el, idx) => {
 			el.addEventListener('keydown', (e) => {
 				if ((e as KeyboardEvent).key === 'Tab' && !e.shiftKey) {
-					// If we're on the last field (65+), cycle back to ordinary income
+					// If we're on the last field (65+), cycle back to ordinary income (less aggressive)
 					if (idx === tabOrder.length - 1) {
 						e.preventDefault()
 						const ordinaryIncomeField = card.querySelector('[data-field="ordinaryIncome"]') as HTMLElement
 						if (ordinaryIncomeField) {
-							ordinaryIncomeField.focus()
+							setTimeout(() => ordinaryIncomeField.focus(), 10)
 						}
 					}
 				}
 			})
 		})
 
-		// Set up selection on focus for all inputs within this card
+		// Set up selection on focus for all inputs within this card (only on click, not programmatic focus)
 		const focusableInputs = card.querySelectorAll('input[data-field], select[data-field]')
 		focusableInputs.forEach(el => {
-			el.addEventListener('focus', () => {
+			el.addEventListener('click', () => {
 				if (el instanceof HTMLInputElement) {
 					setTimeout(() => el.select(), 10)
 				}
 			})
 		})
 
-		// One-time initial focus: Ordinary Income when app opens
+		// One-time initial focus: Ordinary Income when app opens (less aggressive)
 		if (!this.initialFocusDone) {
 			const ordinaryIncomeField = card.querySelector('[data-field="ordinaryIncome"]') as HTMLInputElement | null
 			if (ordinaryIncomeField) {
 				setTimeout(() => {
 					ordinaryIncomeField.focus()
-					ordinaryIncomeField.select()
-				}, 50)
+					// Don't auto-select content to avoid cursor interference
+				}, 100)
 				this.initialFocusDone = true
 			}
 		}
@@ -581,10 +581,10 @@ export class UIManager {
 						inputs: { [field]: value }
 					})
 
-					// Move focus to ordinary income after filing status change
+					// Move focus to ordinary income after filing status change (less aggressive)
 					const ordinaryIncomeField = card.querySelector('[data-field="ordinaryIncome"]') as HTMLElement
 					if (ordinaryIncomeField) {
-						setTimeout(() => ordinaryIncomeField.focus(), 10)
+						setTimeout(() => ordinaryIncomeField.focus(), 50)
 					}
 				})
 			}
