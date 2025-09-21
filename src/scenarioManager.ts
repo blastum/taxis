@@ -26,11 +26,16 @@ export class ScenarioManager {
 		if (stored) {
 			try {
 				this.scenarios = JSON.parse(stored)
-				// Recalculate results for all scenarios
+				// Handle backward compatibility: add taxYear if missing
 				this.scenarios.forEach(scenario => {
+					if (!scenario.inputs.taxYear) {
+						scenario.inputs.taxYear = 2024
+					}
 					scenario.results = calculateTax(scenario.inputs)
 					scenario.detailedBreakdown = calculateDetailedTaxBreakdown(scenario.inputs)
 				})
+				// Save updated scenarios back to storage
+				this.saveToStorage()
 			} catch (e) {
 				console.error('Failed to load scenarios from storage:', e)
 				this.scenarios = []
@@ -43,6 +48,7 @@ export class ScenarioManager {
 			id: Date.now().toString(),
 			name,
 			inputs: {
+				taxYear: 2024,
 				filingStatus: 'single',
 				ordinaryIncome: 0,
 				ordinaryEarnings: 0,

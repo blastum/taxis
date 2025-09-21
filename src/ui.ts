@@ -1,4 +1,4 @@
-import { TaxScenario, FilingStatus, TaxInputs } from './types.js'
+import { TaxScenario, FilingStatus, TaxYear, TaxInputs } from './types.js'
 import { ScenarioManager } from './scenarioManager.js'
 
 export class UIManager {
@@ -109,11 +109,14 @@ export class UIManager {
 				<h3>Inputs</h3>
 				
 				<div class="input-group">
-					<label>Filing Status:</label>
-					<select data-field="filingStatus" data-id="${scenario.id}">
-						<option value="single" ${scenario.inputs.filingStatus === 'single' ? 'selected' : ''}>Single</option>
-						<option value="marriedFilingJointly" ${scenario.inputs.filingStatus === 'marriedFilingJointly' ? 'selected' : ''}>Married Filing Jointly</option>
-						<option value="marriedFilingSeparately" ${scenario.inputs.filingStatus === 'marriedFilingSeparately' ? 'selected' : ''}>Married Filing Separately</option>
+					<label>Tax Table:</label>
+					<select data-field="taxTable" data-id="${scenario.id}">
+						<option value="single-2024" ${scenario.inputs.filingStatus === 'single' && scenario.inputs.taxYear === 2024 ? 'selected' : ''}>Single - 2024</option>
+						<option value="single-2025" ${scenario.inputs.filingStatus === 'single' && scenario.inputs.taxYear === 2025 ? 'selected' : ''}>Single - 2025</option>
+						<option value="marriedFilingJointly-2024" ${scenario.inputs.filingStatus === 'marriedFilingJointly' && scenario.inputs.taxYear === 2024 ? 'selected' : ''}>Married Filing Jointly - 2024</option>
+						<option value="marriedFilingJointly-2025" ${scenario.inputs.filingStatus === 'marriedFilingJointly' && scenario.inputs.taxYear === 2025 ? 'selected' : ''}>Married Filing Jointly - 2025</option>
+						<option value="marriedFilingSeparately-2024" ${scenario.inputs.filingStatus === 'marriedFilingSeparately' && scenario.inputs.taxYear === 2024 ? 'selected' : ''}>Married Filing Separately - 2024</option>
+						<option value="marriedFilingSeparately-2025" ${scenario.inputs.filingStatus === 'marriedFilingSeparately' && scenario.inputs.taxYear === 2025 ? 'selected' : ''}>Married Filing Separately - 2025</option>
 					</select>
 				</div>
 				
@@ -163,6 +166,15 @@ export class UIManager {
 		return card
 	}
 
+	private getFilingStatusDisplay(scenario: TaxScenario): string {
+		const statusMap = {
+			single: 'Single',
+			marriedFilingJointly: 'Married filing jointly',
+			marriedFilingSeparately: 'Married filing separately'
+		}
+		return statusMap[scenario.inputs.filingStatus]
+	}
+
 	private renderSeniorsField(scenario: TaxScenario): string {
 		const filingStatus = scenario.inputs.filingStatus
 		const currentValue = scenario.inputs.seniors65Plus
@@ -183,6 +195,14 @@ export class UIManager {
 		const { results } = scenario
 		return `
 			<div class="results-grid">
+				<div class="result-item">
+					<label>Tax Year:</label>
+					<span>${scenario.inputs.taxYear}</span>
+				</div>
+				<div class="result-item">
+					<label>Filing Status:</label>
+					<span>${this.getFilingStatusDisplay(scenario)}</span>
+				</div>
 				<div class="result-item">
 					<label>Standard Deduction:</label>
 					<span>$${results.standardDeduction.toLocaleString()}</span>
@@ -412,10 +432,10 @@ export class UIManager {
 			el.tabIndex = idx + 1
 		})
 
-		// Remove filing status from tab navigation
-		const filingStatusField = card.querySelector('[data-field="filingStatus"]') as HTMLElement
-		if (filingStatusField) {
-			filingStatusField.tabIndex = -1
+		// Remove tax table from tab navigation
+		const taxTableField = card.querySelector('[data-field="taxTable"]') as HTMLElement
+		if (taxTableField) {
+			taxTableField.tabIndex = -1
 		}
 
 		// Ensure results section and action buttons are not in tab order
@@ -563,25 +583,29 @@ export class UIManager {
 				})
 			}
 
-			// For filing status changes, trigger immediate update to re-render seniors field
-			if (inputElement.dataset.field === 'filingStatus') {
+			// For tax table changes, parse the combined value and update both taxYear and filingStatus
+			if (inputElement.dataset.field === 'taxTable') {
 				inputElement.addEventListener('change', () => {
-					const field = (input as HTMLElement).dataset.field!
 					const id = (input as HTMLElement).dataset.id!
 					const value = inputElement.value
 
-					// Check if value has actually changed
+					// Parse the combined value (e.g., "single-2025" -> filingStatus: "single", taxYear: 2025)
+					const [filingStatus, taxYearStr] = value.split('-')
+					const taxYear = parseInt(taxYearStr, 10) as TaxYear
+
+					// Check if values have actually changed
 					const currentScenario = this.scenarioManager.getScenario(id)
 					if (currentScenario) {
-						const currentValue = currentScenario.inputs[field as keyof typeof currentScenario.inputs]
-						if (value === currentValue) return
+						if (filingStatus === currentScenario.inputs.filingStatus && taxYear === currentScenario.inputs.taxYear) {
+							return
+						}
 					}
 
 					this.scenarioManager.updateScenario(id, {
-						inputs: { [field]: value }
+						inputs: { filingStatus: filingStatus as FilingStatus, taxYear }
 					})
 
-					// Move focus to ordinary income after filing status change (less aggressive)
+					// Move focus to ordinary income after tax table change
 					const ordinaryIncomeField = card.querySelector('[data-field="ordinaryIncome"]') as HTMLElement
 					if (ordinaryIncomeField) {
 						setTimeout(() => ordinaryIncomeField.focus(), 50)

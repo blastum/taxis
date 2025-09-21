@@ -1,6 +1,8 @@
 export type FilingStatus = 'single' | 'marriedFilingJointly' | 'marriedFilingSeparately'
+export type TaxYear = 2024 | 2025
 
 export interface TaxInputs {
+	taxYear: TaxYear
 	filingStatus: FilingStatus
 	ordinaryIncome: number
 	ordinaryEarnings: number

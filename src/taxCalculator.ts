@@ -1,55 +1,99 @@
-import { FilingStatus, TaxInputs, TaxResults, DetailedTaxBreakdown } from './types.js'
+import { FilingStatus, TaxYear, TaxInputs, TaxResults, DetailedTaxBreakdown } from './types.js'
 
-// 2024 Tax Year Constants
-const STANDARD_DEDUCTIONS = {
-	single: 14600,
-	marriedFilingJointly: 29200,
-	marriedFilingSeparately: 14600
-} as const
-
-// Additional standard deduction per person age 65+
-const SENIOR_ADDITIONAL_DEDUCTION: Record<FilingStatus, number> = {
-	single: 1950,
-	marriedFilingJointly: 1550,
-	marriedFilingSeparately: 1550
-}
-
-// 2024 Tax Brackets for Ordinary Income (Rev. Proc. 2023-34)
-const TAX_BRACKETS = {
-	single: [
-		{ min: 0, max: 11600, rate: 0.10 },
-		{ min: 11600, max: 47150, rate: 0.12 },
-		{ min: 47150, max: 100525, rate: 0.22 },
-		{ min: 100525, max: 191950, rate: 0.24 },
-		{ min: 191950, max: 243725, rate: 0.32 },
-		{ min: 243725, max: 609350, rate: 0.35 },
-		{ min: 609350, max: Infinity, rate: 0.37 }
-	],
-	marriedFilingJointly: [
-		{ min: 0, max: 23200, rate: 0.10 },
-		{ min: 23200, max: 94300, rate: 0.12 },
-		{ min: 94300, max: 201050, rate: 0.22 },
-		{ min: 201050, max: 383900, rate: 0.24 },
-		{ min: 383900, max: 487450, rate: 0.32 },
-		{ min: 487450, max: 731200, rate: 0.35 },
-		{ min: 731200, max: Infinity, rate: 0.37 }
-	],
-	marriedFilingSeparately: [
-		{ min: 0, max: 11600, rate: 0.10 },
-		{ min: 11600, max: 47150, rate: 0.12 },
-		{ min: 47150, max: 100525, rate: 0.22 },
-		{ min: 100525, max: 191950, rate: 0.24 },
-		{ min: 191950, max: 243725, rate: 0.32 },
-		{ min: 243725, max: 365600, rate: 0.35 },
-		{ min: 365600, max: Infinity, rate: 0.37 }
-	]
-} as const
-
-// 2024 Long-term Capital Gains thresholds
-const LTCG_THRESHOLDS = {
-	single: { zero: 47025, fifteen: 518900 },
-	marriedFilingJointly: { zero: 94050, fifteen: 583750 },
-	marriedFilingSeparately: { zero: 47025, fifteen: 291850 }
+// Tax Year Constants
+const TAX_YEAR_DATA = {
+	2024: {
+		standardDeductions: {
+			single: 14600,
+			marriedFilingJointly: 29200,
+			marriedFilingSeparately: 14600
+		},
+		seniorAdditionalDeduction: {
+			single: 1950,
+			marriedFilingJointly: 1550,
+			marriedFilingSeparately: 1550
+		},
+		taxBrackets: {
+			single: [
+				{ min: 0, max: 11600, rate: 0.10 },
+				{ min: 11600, max: 47150, rate: 0.12 },
+				{ min: 47150, max: 100525, rate: 0.22 },
+				{ min: 100525, max: 191950, rate: 0.24 },
+				{ min: 191950, max: 243725, rate: 0.32 },
+				{ min: 243725, max: 609350, rate: 0.35 },
+				{ min: 609350, max: Infinity, rate: 0.37 }
+			],
+			marriedFilingJointly: [
+				{ min: 0, max: 23200, rate: 0.10 },
+				{ min: 23200, max: 94300, rate: 0.12 },
+				{ min: 94300, max: 201050, rate: 0.22 },
+				{ min: 201050, max: 383900, rate: 0.24 },
+				{ min: 383900, max: 487450, rate: 0.32 },
+				{ min: 487450, max: 731200, rate: 0.35 },
+				{ min: 731200, max: Infinity, rate: 0.37 }
+			],
+			marriedFilingSeparately: [
+				{ min: 0, max: 11600, rate: 0.10 },
+				{ min: 11600, max: 47150, rate: 0.12 },
+				{ min: 47150, max: 100525, rate: 0.22 },
+				{ min: 100525, max: 191950, rate: 0.24 },
+				{ min: 191950, max: 243725, rate: 0.32 },
+				{ min: 243725, max: 365600, rate: 0.35 },
+				{ min: 365600, max: Infinity, rate: 0.37 }
+			]
+		},
+		ltcgThresholds: {
+			single: { zero: 47025, fifteen: 518900 },
+			marriedFilingJointly: { zero: 94050, fifteen: 583750 },
+			marriedFilingSeparately: { zero: 47025, fifteen: 291850 }
+		}
+	},
+	2025: {
+		standardDeductions: {
+			single: 15000,
+			marriedFilingJointly: 30000,
+			marriedFilingSeparately: 15000
+		},
+		seniorAdditionalDeduction: {
+			single: 2000,
+			marriedFilingJointly: 1600,
+			marriedFilingSeparately: 1600
+		},
+		taxBrackets: {
+			single: [
+				{ min: 0, max: 11925, rate: 0.10 },
+				{ min: 11925, max: 48475, rate: 0.12 },
+				{ min: 48475, max: 103350, rate: 0.22 },
+				{ min: 103350, max: 197300, rate: 0.24 },
+				{ min: 197300, max: 250525, rate: 0.32 },
+				{ min: 250525, max: 626350, rate: 0.35 },
+				{ min: 626350, max: Infinity, rate: 0.37 }
+			],
+			marriedFilingJointly: [
+				{ min: 0, max: 23850, rate: 0.10 },
+				{ min: 23850, max: 96950, rate: 0.12 },
+				{ min: 96950, max: 206700, rate: 0.22 },
+				{ min: 206700, max: 394600, rate: 0.24 },
+				{ min: 394600, max: 501050, rate: 0.32 },
+				{ min: 501050, max: 751600, rate: 0.35 },
+				{ min: 751600, max: Infinity, rate: 0.37 }
+			],
+			marriedFilingSeparately: [
+				{ min: 0, max: 11925, rate: 0.10 },
+				{ min: 11925, max: 48475, rate: 0.12 },
+				{ min: 48475, max: 103350, rate: 0.22 },
+				{ min: 103350, max: 197300, rate: 0.24 },
+				{ min: 197300, max: 250525, rate: 0.32 },
+				{ min: 250525, max: 375800, rate: 0.35 },
+				{ min: 375800, max: Infinity, rate: 0.37 }
+			]
+		},
+		ltcgThresholds: {
+			single: { zero: 48475, fifteen: 535925 },
+			marriedFilingJointly: { zero: 96950, fifteen: 601650 },
+			marriedFilingSeparately: { zero: 48475, fifteen: 300825 }
+		}
+	}
 } as const
 
 function calculateTaxFromBrackets(income: number, brackets: readonly { min: number; max: number; rate: number }[]): number {
@@ -66,8 +110,9 @@ function calculateTaxFromBrackets(income: number, brackets: readonly { min: numb
 }
 
 export function calculateTax(inputs: TaxInputs): TaxResults {
-	const standardDeduction = STANDARD_DEDUCTIONS[inputs.filingStatus]
-	const seniorDeductionPerPerson = SENIOR_ADDITIONAL_DEDUCTION[inputs.filingStatus]
+	const taxData = TAX_YEAR_DATA[inputs.taxYear]
+	const standardDeduction = taxData.standardDeductions[inputs.filingStatus]
+	const seniorDeductionPerPerson = taxData.seniorAdditionalDeduction[inputs.filingStatus]
 	const seniorDeduction = inputs.seniors65Plus * seniorDeductionPerPerson
 	const totalDeductions = standardDeduction + seniorDeduction
 
@@ -85,10 +130,10 @@ export function calculateTax(inputs: TaxInputs): TaxResults {
 	const ltcgTaxable = Math.max(0, netCapitalGains - deductionLeftoverForLTCG)
 
 	// Ordinary tax using ordinary brackets
-	const ordinaryTax = calculateTaxFromBrackets(ordinaryTaxable, TAX_BRACKETS[inputs.filingStatus])
+	const ordinaryTax = calculateTaxFromBrackets(ordinaryTaxable, taxData.taxBrackets[inputs.filingStatus])
 
 	// LTCG stacking on top of taxable ordinary income
-	const { zero: zeroThreshold, fifteen: fifteenThreshold } = LTCG_THRESHOLDS[inputs.filingStatus]
+	const { zero: zeroThreshold, fifteen: fifteenThreshold } = taxData.ltcgThresholds[inputs.filingStatus]
 	let remainingLTCG = ltcgTaxable
 	const zeroPortion = Math.min(remainingLTCG, Math.max(0, zeroThreshold - ordinaryTaxable))
 	remainingLTCG -= zeroPortion
@@ -125,8 +170,9 @@ export function calculateTax(inputs: TaxInputs): TaxResults {
 }
 
 export function calculateDetailedTaxBreakdown(inputs: TaxInputs): DetailedTaxBreakdown {
-	const standardDeduction = STANDARD_DEDUCTIONS[inputs.filingStatus]
-	const seniorDeductionPerPerson = SENIOR_ADDITIONAL_DEDUCTION[inputs.filingStatus]
+	const taxData = TAX_YEAR_DATA[inputs.taxYear]
+	const standardDeduction = taxData.standardDeductions[inputs.filingStatus]
+	const seniorDeductionPerPerson = taxData.seniorAdditionalDeduction[inputs.filingStatus]
 	const seniorDeduction = inputs.seniors65Plus * seniorDeductionPerPerson
 	const totalDeductions = standardDeduction + seniorDeduction
 
@@ -141,7 +187,7 @@ export function calculateDetailedTaxBreakdown(inputs: TaxInputs): DetailedTaxBre
 	const ltcgTaxable = Math.max(0, netCapitalGains - deductionLeftoverForLTCG)
 
 	// Detailed ordinary tax calculation
-	const brackets = TAX_BRACKETS[inputs.filingStatus]
+	const brackets = taxData.taxBrackets[inputs.filingStatus]
 	const ordinaryTaxBrackets = []
 	let remainingIncome = ordinaryTaxable
 
@@ -162,7 +208,7 @@ export function calculateDetailedTaxBreakdown(inputs: TaxInputs): DetailedTaxBre
 	}
 
 	// LTCG detailed calculation
-	const { zero: zeroThreshold, fifteen: fifteenThreshold } = LTCG_THRESHOLDS[inputs.filingStatus]
+	const { zero: zeroThreshold, fifteen: fifteenThreshold } = taxData.ltcgThresholds[inputs.filingStatus]
 	let remainingLTCG = ltcgTaxable
 	const zeroPortion = Math.min(remainingLTCG, Math.max(0, zeroThreshold - ordinaryTaxable))
 	remainingLTCG -= zeroPortion

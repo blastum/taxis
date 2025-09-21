@@ -48,6 +48,7 @@ Taxis is a web-based tax calculation application that allows users to create and
   - Formatted currency and percentage displays
   - Interactive scenario management
   - Smart tab navigation with focus management
+  - Combined "Tax Table" dropdown for filing status and year selection
   - Conditional form fields based on filing status
 
 #### 4. **Type Definitions (`src/types.ts`)**
