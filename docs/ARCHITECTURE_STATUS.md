@@ -159,6 +159,7 @@ The application features a sophisticated tab navigation system designed for opti
 - **Immediate Updates**: Checkboxes, select dropdowns, and number inputs update immediately on change
 - **Debounced Text Inputs**: Text fields use 150ms debounce to prevent excessive calculations during typing
 - **Selective Re-rendering**: Real-time updates use silent scenario updates with manual results display updates to preserve focus
+- **Configurable Focus Preservation**: Focus preservation can be toggled via `uiManager.setFocusPreservation(true/false)`
 
 ### **Conditional Field Rendering**
 - **Seniors Field**: Dynamically renders as "65+" label + checkbox (Single/MFS) or number input 0-2 (MFJ)
@@ -177,6 +178,34 @@ The application features a sophisticated tab navigation system designed for opti
 - **Detailed Breakdown**: Shows income summary, deductions, tax bracket calculations, capital gains tiers, and NIIT details
 - **Interactive Features**: ESC key close, click-outside close, smooth animations
 - **Responsive Design**: Mobile-optimized modal layout
+
+## Configuration Options
+
+### Focus Preservation During Real-time Updates
+
+The application includes a configurable focus preservation system to prevent input fields from losing focus during real-time tax calculations:
+
+```typescript
+// In src/main.ts
+const uiManager = new UIManager(scenarioManager)
+
+// Enable focus preservation (default behavior)
+uiManager.setFocusPreservation(true)
+
+// Disable focus preservation (may cause focus loss during typing)
+uiManager.setFocusPreservation(false)
+```
+
+**When Enabled (default)**:
+- Uses `updateScenarioSilently()` to update data without triggering full re-renders
+- Manually updates only the results display section
+- Preserves focus and cursor position during typing
+- Slightly more complex but provides better user experience
+
+**When Disabled**:
+- Uses normal `updateScenario()` which triggers full re-renders
+- Simpler implementation but may cause focus loss during typing
+- Useful for debugging or if focus preservation causes issues
 
 ## Development Setup
 

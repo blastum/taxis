@@ -5,6 +5,11 @@ export class UIManager {
 	private scenarioManager: ScenarioManager
 	private scenariosContainer: HTMLElement
 	private initialFocusDone: boolean = false
+	
+	// Configuration: Enable focus preservation during real-time updates
+	// When true: Uses silent updates to prevent focus loss during typing
+	// When false: Uses normal updates with full re-renders (may cause focus loss)
+	private preserveFocusDuringUpdates: boolean = true
 
 	constructor(scenarioManager: ScenarioManager) {
 		this.scenarioManager = scenarioManager
@@ -14,6 +19,22 @@ export class UIManager {
 		this.setupGlobalModal()
 		this.scenarioManager.addListener(() => this.render())
 		this.render()
+	}
+
+	/**
+	 * Toggle focus preservation during real-time updates
+	 * @param enabled - true to preserve focus (default), false to allow full re-renders
+	 */
+	public setFocusPreservation(enabled: boolean): void {
+		this.preserveFocusDuringUpdates = enabled
+	}
+
+	/**
+	 * Get current focus preservation setting
+	 * @returns true if focus preservation is enabled, false otherwise
+	 */
+	public getFocusPreservation(): boolean {
+		return this.preserveFocusDuringUpdates
 	}
 
 	private isValidInteger(value: string): boolean {
@@ -503,13 +524,20 @@ export class UIManager {
 								if (parsedValue === currentValue) return
 							}
 
-							// Use silent update to prevent focus loss
-							this.scenarioManager.updateScenarioSilently(id, {
-								inputs: { [field]: parsedValue }
-							})
+							if (this.preserveFocusDuringUpdates) {
+								// Use silent update to prevent focus loss
+								this.scenarioManager.updateScenarioSilently(id, {
+									inputs: { [field]: parsedValue }
+								})
 
-							// Manually update just the results display for this scenario
-							this.updateResultsDisplay(id)
+								// Manually update just the results display for this scenario
+								this.updateResultsDisplay(id)
+							} else {
+								// Use normal update with full re-render (may cause focus loss)
+								this.scenarioManager.updateScenario(id, {
+									inputs: { [field]: parsedValue }
+								})
+							}
 						}
 					}, 150) // 150ms debounce
 				})
