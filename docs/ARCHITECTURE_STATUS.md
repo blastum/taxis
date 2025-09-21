@@ -209,7 +209,7 @@ uiManager.setFocusPreservation(false)
 
 ## Development Setup
 
-### Running the Application
+### Running the Application Locally
 
 1. **Install dependencies**: `npm install`
 2. **Start development server**: `npm run dev`
@@ -220,8 +220,37 @@ uiManager.setFocusPreservation(false)
      - `npm run serve` - Start Python HTTP server only (port 8000)
 3. **Open browser**: Navigate to `http://localhost:8000`
 
+### GitHub Pages Deployment
+
+The application is configured for automatic deployment to GitHub Pages:
+
+#### **Live Site**
+- **URL**: `https://[username].github.io/Taxis/` (replace [username] with your GitHub username)
+- **Auto-deployment**: Triggered on every push to `main` branch
+
+#### **Deployment Process**
+1. **GitHub Actions Workflow**: `.github/workflows/deploy.yml`
+2. **Build Steps**:
+   - Install Node.js 18 and dependencies
+   - Compile TypeScript to JavaScript (`npm run build`)
+   - Deploy entire project (including `dist/` folder) to GitHub Pages
+3. **Automatic Updates**: Any push to `main` branch triggers a new deployment
+
+#### **Setup Instructions**
+1. **Enable GitHub Pages** in repository settings:
+   - Go to Settings → Pages
+   - Source: GitHub Actions
+2. **Push Changes**: Workflow runs automatically on push to `main`
+3. **View Deployment**: Check Actions tab for deployment status
+
+#### **Important Notes**
+- **Build Output**: `dist/` folder is generated during deployment (not in source control)
+- **Source Maps**: Excluded from repository (*.js.map in .gitignore)
+- **Workflow Permissions**: Configured for Pages deployment with appropriate permissions
+
 ### Server Configuration
 - **Development Server**: Python 3 HTTP server (port 8000)
+- **Production Server**: GitHub Pages static hosting
 - **Build Process**: TypeScript compiler with source maps
 - **File Serving**: Static files served from project root
 
