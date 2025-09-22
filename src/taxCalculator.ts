@@ -46,6 +46,11 @@ const TAX_YEAR_DATA = {
 			single: { zero: 47025, fifteen: 518900 },
 			marriedFilingJointly: { zero: 94050, fifteen: 583750 },
 			marriedFilingSeparately: { zero: 47025, fifteen: 291850 }
+		},
+		niitThresholds: {
+			single: 200000,
+			marriedFilingJointly: 250000,
+			marriedFilingSeparately: 125000
 		}
 	},
 	2025: {
@@ -92,6 +97,11 @@ const TAX_YEAR_DATA = {
 			single: { zero: 48475, fifteen: 535925 },
 			marriedFilingJointly: { zero: 96950, fifteen: 601650 },
 			marriedFilingSeparately: { zero: 48475, fifteen: 300825 }
+		},
+		niitThresholds: {
+			single: 200000,
+			marriedFilingJointly: 250000,
+			marriedFilingSeparately: 125000
 		}
 	}
 } as const
@@ -143,14 +153,10 @@ export function calculateTax(inputs: TaxInputs): TaxResults {
 	const capitalGainsTax = zeroPortion * 0 + fifteenPortion * 0.15 + twentyPortion * 0.20
 
 	// NIIT (3.8%)
-	const NIIT_THRESHOLDS: Record<FilingStatus, number> = {
-		single: 200000,
-		marriedFilingJointly: 250000,
-		marriedFilingSeparately: 125000
-	}
 	const magiApprox = ordinaryGross + netCapitalGains
 	const netInvestmentIncome = Math.max(0, inputs.ordinaryEarnings) + netCapitalGains
-	const niitExcess = Math.max(0, magiApprox - NIIT_THRESHOLDS[inputs.filingStatus])
+	const niitThreshold = taxData.niitThresholds[inputs.filingStatus]
+	const niitExcess = Math.max(0, magiApprox - niitThreshold)
 	const niitTax = 0.038 * Math.min(netInvestmentIncome, niitExcess)
 
 	const totalTax = ordinaryTax + capitalGainsTax + niitTax
@@ -217,14 +223,10 @@ export function calculateDetailedTaxBreakdown(inputs: TaxInputs): DetailedTaxBre
 	const twentyPortion = Math.max(0, remainingLTCG)
 
 	// NIIT detailed calculation
-	const NIIT_THRESHOLDS: Record<FilingStatus, number> = {
-		single: 200000,
-		marriedFilingJointly: 250000,
-		marriedFilingSeparately: 125000
-	}
 	const magiApprox = ordinaryGross + netCapitalGains
 	const netInvestmentIncome = Math.max(0, inputs.ordinaryEarnings) + netCapitalGains
-	const niitExcess = Math.max(0, magiApprox - NIIT_THRESHOLDS[inputs.filingStatus])
+	const niitThreshold = taxData.niitThresholds[inputs.filingStatus]
+	const niitExcess = Math.max(0, magiApprox - niitThreshold)
 	const niitAmount = 0.038 * Math.min(netInvestmentIncome, niitExcess)
 
 	return {
@@ -251,7 +253,7 @@ export function calculateDetailedTaxBreakdown(inputs: TaxInputs): DetailedTaxBre
 		},
 		niit: {
 			magi: magiApprox,
-			threshold: NIIT_THRESHOLDS[inputs.filingStatus],
+			threshold: niitThreshold,
 			excess: niitExcess,
 			netInvestmentIncome,
 			niitAmount

@@ -11,15 +11,17 @@ Taxis is a web-based tax calculation application that allows users to create and
 #### 1. **Tax Calculator (`src/taxCalculator.ts`)**
 - **Purpose**: Pure calculation logic for US federal income tax
 - **Responsibilities**: 
-  - Calculate taxes based on 2024 tax brackets and rates
+  - Calculate taxes based on year-specific tax brackets and rates
   - Handle ordinary income and long-term capital gains separately
   - Apply standard deductions and senior additional deductions
-  - Compute effective tax rates
+  - Compute effective tax rates and NIIT (Net Investment Income Tax)
 - **Key Features**:
   - Support for single, married filing jointly, and married filing separately
+  - Year-based tax data structure (2024, 2025) with automatic selection
   - Separate tax brackets for ordinary income vs. long-term capital gains
   - Standard deductions with additional senior deductions (65+)
   - Capital loss handling
+  - NIIT calculation with year-specific thresholds
 
 #### 2. **Scenario Manager (`src/scenarioManager.ts`)**
 - **Purpose**: Data management and persistence layer
@@ -290,6 +292,57 @@ The application features a modern, professional design with the following charac
   - Kill old server if needed: `kill <PID>`
   - Restart development server: `npm run dev`
 - **Port conflicts**: Ensure port 8000 is available before starting the server
+
+## Tax Parameter Updates
+
+### Annual Tax Data Maintenance
+
+The application uses a year-based tax data structure (`TAX_YEAR_DATA`) that contains all tax parameters for each supported tax year. This structure includes:
+
+#### **Tax Parameters by Year:**
+- **Standard Deductions**: Base deduction amounts by filing status
+- **Senior Additional Deductions**: Additional deduction amounts for taxpayers 65+
+- **Tax Brackets**: Progressive income tax rates and thresholds
+- **LTCG Thresholds**: Long-term capital gains tax rate thresholds (0%, 15%, 20%)
+- **NIIT Thresholds**: Net Investment Income Tax thresholds by filing status
+
+#### **How to Update Tax Parameters for New Tax Years:**
+
+1. **Research Official IRS Publications:**
+   - Monitor IRS Revenue Procedures (typically published in late October/November)
+   - Check IRS.gov for official inflation adjustments
+   - Verify all parameters: standard deductions, tax brackets, LTCG thresholds, NIIT thresholds
+
+2. **Update the Tax Data Structure:**
+   ```typescript
+   const TAX_YEAR_DATA = {
+     2026: { // Add new tax year
+       standardDeductions: { /* updated amounts */ },
+       seniorAdditionalDeduction: { /* updated amounts */ },
+       taxBrackets: { /* updated brackets and rates */ },
+       ltcgThresholds: { /* updated LTCG thresholds */ },
+       niitThresholds: { /* NIIT thresholds (may remain unchanged) */ }
+     }
+   }
+   ```
+
+3. **Update Type Definitions:**
+   - Add new year to `TaxYear` type in `src/types.ts`
+   - Update UI dropdown options in `src/ui.ts`
+
+4. **Verification Process:**
+   - Test calculations with known examples from IRS publications
+   - Compare results with official IRS tax calculators
+   - Verify all filing statuses and edge cases
+
+#### **Key Sources for Tax Updates:**
+- **IRS Revenue Procedures**: Official inflation adjustments
+- **IRS Publication 15**: Employer tax guides with current brackets
+- **IRS.gov Tax Topics**: Current year tax information
+- **Form 1040 Instructions**: Standard deduction amounts
+
+#### **NIIT Threshold Notes:**
+NIIT thresholds have remained constant since 2013 ($200K single, $250K MFJ, $125K MFS) and are not indexed for inflation. However, they should be verified annually as Congress could change them.
 
 ## Future Enhancements
 
