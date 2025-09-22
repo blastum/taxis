@@ -169,7 +169,19 @@ export class UIManager {
 						<span>$${roundToDollar(results.niitTax).toLocaleString()}</span>
 					</div>
 					` : ''}
+					${results.capitalLossOffset > 0 ? `
+					<div class="hud-breakdown-item">
+						<span>Loss Offset:</span>
+						<span>-$${roundToDollar(results.capitalLossOffset).toLocaleString()}</span>
+					</div>
+					` : ''}
 				</div>
+				${results.remainingCapitalLosses > 0 ? `
+				<div class="hud-item">
+					<span class="hud-label">Remaining Losses:</span>
+					<span class="hud-value">$${roundToDollar(results.remainingCapitalLosses).toLocaleString()}</span>
+				</div>
+				` : ''}
 			</div>
 		`
 	}
@@ -375,6 +387,18 @@ export class UIManager {
 					<label>NIIT (3.8%):</label>
 					<span>$${roundToDollar(results.niitTax).toLocaleString()}</span>
 				</div>
+				${results.capitalLossOffset > 0 ? `
+				<div class="result-item">
+					<label>Capital Loss Offset:</label>
+					<span>-$${roundToDollar(results.capitalLossOffset).toLocaleString()}</span>
+				</div>
+				` : ''}
+				${results.remainingCapitalLosses > 0 ? `
+				<div class="result-item">
+					<label>Remaining Capital Losses:</label>
+					<span>$${roundToDollar(results.remainingCapitalLosses).toLocaleString()}</span>
+				</div>
+				` : ''}
 				<div class="result-item highlight">
 					<label>Total Tax:</label>
 					<span>$${roundToDollar(results.totalTax).toLocaleString()}</span>
@@ -423,6 +447,18 @@ export class UIManager {
 								<div class="breakdown-item">
 									<label>Capital Losses:</label>
 									<span>-$${roundToDollar(income.capitalLosses).toLocaleString()}</span>
+								</div>
+								` : ''}
+								${income.capitalLossOffset > 0 ? `
+								<div class="breakdown-item highlight">
+									<label>Capital Loss Offset (max $3,000):</label>
+									<span>-$${roundToDollar(income.capitalLossOffset).toLocaleString()}</span>
+								</div>
+								` : ''}
+								${income.remainingCapitalLosses > 0 ? `
+								<div class="breakdown-item">
+									<label>Remaining Capital Losses (carryforward):</label>
+									<span>$${roundToDollar(income.remainingCapitalLosses).toLocaleString()}</span>
 								</div>
 								` : ''}
 							</div>

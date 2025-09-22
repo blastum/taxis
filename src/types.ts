@@ -21,6 +21,8 @@ export interface TaxResults {
 	niitTax: number
 	totalTax: number
 	effectiveRate: number
+	capitalLossOffset: number
+	remainingCapitalLosses: number
 }
 
 export interface DetailedTaxBreakdown {
@@ -28,6 +30,8 @@ export interface DetailedTaxBreakdown {
 		totalStandardIncome: number
 		longTermCapitalGains: number
 		capitalLosses: number
+		capitalLossOffset: number
+		remainingCapitalLosses: number
 	}
 	deductions: {
 		standardDeduction: number
