@@ -176,12 +176,6 @@ export class UIManager {
 					</div>
 					` : ''}
 				</div>
-				${results.remainingCapitalLosses > 0 ? `
-				<div class="hud-item">
-					<span class="hud-label">Remaining Losses:</span>
-					<span class="hud-value">$${roundToDollar(results.remainingCapitalLosses).toLocaleString()}</span>
-				</div>
-				` : ''}
 			</div>
 		`
 	}
