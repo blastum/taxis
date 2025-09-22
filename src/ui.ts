@@ -37,6 +37,143 @@ export class UIManager {
 		return this.preserveFocusDuringUpdates
 	}
 
+	private setupFloatingResultsHUD() {
+		// Create floating results HUD container
+		const hudContainer = document.createElement('div')
+		hudContainer.id = 'floating-results-hud'
+		hudContainer.style.display = 'none'
+		document.body.appendChild(hudContainer)
+
+		// Track currently focused input and its scenario
+		let currentFocusedInput: HTMLInputElement | null = null
+		let currentFocusedScenarioId: string | null = null
+
+		// Global focus/blur listeners for input fields
+		document.addEventListener('focusin', (e) => {
+			const target = e.target as HTMLElement
+			if (target && (target.tagName === 'INPUT' || target.tagName === 'SELECT')) {
+				const input = target as HTMLInputElement
+				const scenarioId = input.dataset.id
+
+				if (scenarioId && input.dataset.field) {
+					currentFocusedInput = input
+					currentFocusedScenarioId = scenarioId
+					this.showFloatingResultsHUD(scenarioId, input)
+				}
+			}
+		})
+
+		document.addEventListener('focusout', (e) => {
+			// Small delay to allow for tab navigation
+			setTimeout(() => {
+				const activeElement = document.activeElement as HTMLElement
+				if (!activeElement || (activeElement.tagName !== 'INPUT' && activeElement.tagName !== 'SELECT')) {
+					this.hideFloatingResultsHUD()
+					currentFocusedInput = null
+					currentFocusedScenarioId = null
+				}
+			}, 100)
+		})
+	}
+
+	private showFloatingResultsHUD(scenarioId: string, inputElement: HTMLInputElement) {
+		const scenario = this.scenarioManager.getScenario(scenarioId)
+		if (!scenario || !scenario.results) return
+
+		const hudContainer = document.getElementById('floating-results-hud')!
+
+		// Get input element position for intelligent positioning
+		const inputRect = inputElement.getBoundingClientRect()
+		const viewportWidth = window.innerWidth
+		const viewportHeight = window.innerHeight
+
+		// Calculate optimal position
+		let hudX = inputRect.right + 20 // Default: to the right of input
+		let hudY = inputRect.top
+
+		// Adjust if HUD would go off-screen to the right
+		if (hudX + 300 > viewportWidth) {
+			hudX = inputRect.left - 320 // Position to the left instead
+		}
+
+		// Adjust if HUD would go off-screen vertically
+		if (hudY + 200 > viewportHeight) {
+			hudY = viewportHeight - 220 // Position above bottom
+		}
+
+		// Ensure HUD doesn't go off-screen to the left
+		if (hudX < 20) {
+			hudX = 20
+		}
+
+		// Ensure HUD doesn't go above viewport
+		if (hudY < 20) {
+			hudY = 20
+		}
+
+		hudContainer.style.left = `${hudX}px`
+		hudContainer.style.top = `${hudY}px`
+		hudContainer.innerHTML = this.renderFloatingResults(scenario)
+		hudContainer.style.display = 'block'
+	}
+
+	private hideFloatingResultsHUD() {
+		const hudContainer = document.getElementById('floating-results-hud')!
+		hudContainer.style.display = 'none'
+	}
+
+	private renderFloatingResults(scenario: TaxScenario): string {
+		if (!scenario.results) return '<div class="hud-no-results">No results</div>'
+
+		const { results } = scenario
+
+		// IRS rounding to nearest dollar
+		const roundToDollar = (amount: number) => Math.round(amount)
+
+		return `
+			<div class="hud-header">
+				<h4>${scenario.name}</h4>
+				<span class="hud-status">Live Results</span>
+			</div>
+			<div class="hud-results">
+				<div class="hud-item">
+					<span class="hud-label">Total Deductions:</span>
+					<span class="hud-value">$${roundToDollar(results.totalDeductions).toLocaleString()}</span>
+				</div>
+				<div class="hud-item">
+					<span class="hud-label">Taxable Income:</span>
+					<span class="hud-value">$${roundToDollar(results.taxableIncome).toLocaleString()}</span>
+				</div>
+				<div class="hud-item">
+					<span class="hud-label">Total Tax:</span>
+					<span class="hud-value hud-highlight">$${roundToDollar(results.totalTax).toLocaleString()}</span>
+				</div>
+				<div class="hud-item">
+					<span class="hud-label">Effective Rate:</span>
+					<span class="hud-value hud-highlight">${results.effectiveRate.toFixed(2)}%</span>
+				</div>
+				<div class="hud-breakdown">
+					<div class="hud-breakdown-item">
+						<span>Ordinary:</span>
+						<span>$${roundToDollar(results.ordinaryTax).toLocaleString()}</span>
+					</div>
+					${results.capitalGainsTax > 0 ? `
+					<div class="hud-breakdown-item">
+						<span>Cap Gains:</span>
+						<span>$${roundToDollar(results.capitalGainsTax).toLocaleString()}</span>
+					</div>
+					` : ''}
+					${results.niitTax > 0 ? `
+					<div class="hud-breakdown-item">
+						<span>NIIT:</span>
+						<span>$${roundToDollar(results.niitTax).toLocaleString()}</span>
+					</div>
+					` : ''}
+				</div>
+			</div>
+		`
+	}
+
 	private isValidInteger(value: string): boolean {
 		// Allow empty string (will be treated as 0)
 		if (value === '') return true
@@ -69,6 +206,9 @@ export class UIManager {
 		const modalContainer = document.createElement('div')
 		modalContainer.id = 'global-modal-container'
 		document.body.appendChild(modalContainer)
+
+		// Create floating results HUD
+		this.setupFloatingResultsHUD()
 
 		// Handle ESC key globally
 		document.addEventListener('keydown', (e) => {
@@ -193,6 +333,10 @@ export class UIManager {
 		if (!scenario.results) return '<p>No results calculated</p>'
 
 		const { results } = scenario
+
+		// IRS rounding to nearest dollar
+		const roundToDollar = (amount: number) => Math.round(amount)
+
 		return `
 			<div class="results-grid">
 				<div class="result-item">
@@ -205,35 +349,35 @@ export class UIManager {
 				</div>
 				<div class="result-item">
 					<label>Standard Deduction:</label>
-					<span>$${results.standardDeduction.toLocaleString()}</span>
+					<span>$${roundToDollar(results.standardDeduction).toLocaleString()}</span>
 				</div>
 				<div class="result-item">
 					<label>Senior Deduction:</label>
-					<span>$${results.seniorDeduction.toLocaleString()}</span>
+					<span>$${roundToDollar(results.seniorDeduction).toLocaleString()}</span>
 				</div>
 				<div class="result-item">
 					<label>Total Deductions:</label>
-					<span>$${results.totalDeductions.toLocaleString()}</span>
+					<span>$${roundToDollar(results.totalDeductions).toLocaleString()}</span>
 				</div>
 				<div class="result-item">
 					<label>Taxable Income:</label>
-					<span>$${results.taxableIncome.toLocaleString()}</span>
+					<span>$${roundToDollar(results.taxableIncome).toLocaleString()}</span>
 				</div>
 				<div class="result-item">
 					<label>Ordinary Tax:</label>
-					<span>$${results.ordinaryTax.toLocaleString()}</span>
+					<span>$${roundToDollar(results.ordinaryTax).toLocaleString()}</span>
 				</div>
 				<div class="result-item">
 					<label>Capital Gains Tax:</label>
-					<span>$${results.capitalGainsTax.toLocaleString()}</span>
+					<span>$${roundToDollar(results.capitalGainsTax).toLocaleString()}</span>
 				</div>
 				<div class="result-item">
 					<label>NIIT (3.8%):</label>
-					<span>$${results.niitTax.toLocaleString()}</span>
+					<span>$${roundToDollar(results.niitTax).toLocaleString()}</span>
 				</div>
 				<div class="result-item highlight">
 					<label>Total Tax:</label>
-					<span>$${results.totalTax.toLocaleString()}</span>
+					<span>$${roundToDollar(results.totalTax).toLocaleString()}</span>
 				</div>
 				<div class="result-item highlight">
 					<label>Effective Rate:</label>
@@ -247,6 +391,9 @@ export class UIManager {
 		if (!scenario.detailedBreakdown) return ''
 
 		const { income, deductions, ordinaryTax, capitalGainsTax, niit } = scenario.detailedBreakdown
+
+		// IRS rounding to nearest dollar
+		const roundToDollar = (amount: number) => Math.round(amount)
 
 		return `
 			<div class="modal-overlay" data-modal-id="${scenario.id}" style="display: none;">
@@ -266,16 +413,16 @@ export class UIManager {
 							<div class="breakdown-grid">
 								<div class="breakdown-item">
 									<label>Total Standard Income:</label>
-									<span>$${income.totalStandardIncome.toLocaleString()}</span>
+									<span>$${roundToDollar(income.totalStandardIncome).toLocaleString()}</span>
 								</div>
 								<div class="breakdown-item">
 									<label>Long-term Capital Gains:</label>
-									<span>$${income.longTermCapitalGains.toLocaleString()}</span>
+									<span>$${roundToDollar(income.longTermCapitalGains).toLocaleString()}</span>
 								</div>
 								${income.capitalLosses > 0 ? `
 								<div class="breakdown-item">
 									<label>Capital Losses:</label>
-									<span>-$${income.capitalLosses.toLocaleString()}</span>
+									<span>-$${roundToDollar(income.capitalLosses).toLocaleString()}</span>
 								</div>
 								` : ''}
 							</div>
@@ -286,17 +433,17 @@ export class UIManager {
 							<div class="breakdown-grid">
 								<div class="breakdown-item">
 									<label>Standard Deduction:</label>
-									<span>$${deductions.standardDeduction.toLocaleString()}</span>
+									<span>$${roundToDollar(deductions.standardDeduction).toLocaleString()}</span>
 								</div>
 								${deductions.seniorDeduction > 0 ? `
 								<div class="breakdown-item">
-									<label>Senior Deduction (${scenario.inputs.seniors65Plus} × $${deductions.seniorDeductionPerPerson.toLocaleString()}):</label>
-									<span>$${deductions.seniorDeduction.toLocaleString()}</span>
+									<label>Senior Deduction (${scenario.inputs.seniors65Plus} × $${roundToDollar(deductions.seniorDeductionPerPerson).toLocaleString()}):</label>
+									<span>$${roundToDollar(deductions.seniorDeduction).toLocaleString()}</span>
 								</div>
 								` : ''}
 								<div class="breakdown-item highlight">
 									<label>Total Deductions:</label>
-									<span>$${deductions.totalDeductions.toLocaleString()}</span>
+									<span>$${roundToDollar(deductions.totalDeductions).toLocaleString()}</span>
 								</div>
 							</div>
 						</div>
@@ -306,12 +453,12 @@ export class UIManager {
 							<div class="breakdown-grid">
 								<div class="breakdown-item">
 									<label>Taxable Ordinary Income:</label>
-									<span>$${ordinaryTax.taxableOrdinaryIncome.toLocaleString()}</span>
+									<span>$${roundToDollar(ordinaryTax.taxableOrdinaryIncome).toLocaleString()}</span>
 								</div>
 								${ordinaryTax.brackets.map(bracket => `
 								<div class="breakdown-item bracket-item">
-									<label>$${bracket.amount.toLocaleString()} at ${(bracket.rate * 100).toFixed(0)}%:</label>
-									<span>$${bracket.tax.toLocaleString()}</span>
+									<label>$${roundToDollar(bracket.amount).toLocaleString()} at ${(bracket.rate * 100).toFixed(0)}%:</label>
+									<span>$${roundToDollar(bracket.tax).toLocaleString()}</span>
 								</div>
 								`).join('')}
 							</div>
@@ -322,24 +469,24 @@ export class UIManager {
 							<div class="breakdown-grid">
 								<div class="breakdown-item">
 									<label>Taxable Capital Gains:</label>
-									<span>$${capitalGainsTax.taxableCapitalGains.toLocaleString()}</span>
+									<span>$${roundToDollar(capitalGainsTax.taxableCapitalGains).toLocaleString()}</span>
 								</div>
 								${capitalGainsTax.zeroBracket.amount > 0 ? `
 								<div class="breakdown-item bracket-item">
-									<label>$${capitalGainsTax.zeroBracket.amount.toLocaleString()} at 0%:</label>
-									<span>$${capitalGainsTax.zeroBracket.tax.toLocaleString()}</span>
+									<label>$${roundToDollar(capitalGainsTax.zeroBracket.amount).toLocaleString()} at 0%:</label>
+									<span>$${roundToDollar(capitalGainsTax.zeroBracket.tax).toLocaleString()}</span>
 								</div>
 								` : ''}
 								${capitalGainsTax.fifteenBracket.amount > 0 ? `
 								<div class="breakdown-item bracket-item">
-									<label>$${capitalGainsTax.fifteenBracket.amount.toLocaleString()} at 15%:</label>
-									<span>$${capitalGainsTax.fifteenBracket.tax.toLocaleString()}</span>
+									<label>$${roundToDollar(capitalGainsTax.fifteenBracket.amount).toLocaleString()} at 15%:</label>
+									<span>$${roundToDollar(capitalGainsTax.fifteenBracket.tax).toLocaleString()}</span>
 								</div>
 								` : ''}
 								${capitalGainsTax.twentyBracket.amount > 0 ? `
 								<div class="breakdown-item bracket-item">
-									<label>$${capitalGainsTax.twentyBracket.amount.toLocaleString()} at 20%:</label>
-									<span>$${capitalGainsTax.twentyBracket.tax.toLocaleString()}</span>
+									<label>$${roundToDollar(capitalGainsTax.twentyBracket.amount).toLocaleString()} at 20%:</label>
+									<span>$${roundToDollar(capitalGainsTax.twentyBracket.tax).toLocaleString()}</span>
 								</div>
 								` : ''}
 							</div>
@@ -351,23 +498,23 @@ export class UIManager {
 							<div class="breakdown-grid">
 								<div class="breakdown-item">
 									<label>Modified AGI:</label>
-									<span>$${niit.magi.toLocaleString()}</span>
+									<span>$${roundToDollar(niit.magi).toLocaleString()}</span>
 								</div>
 								<div class="breakdown-item">
 									<label>NIIT Threshold:</label>
-									<span>$${niit.threshold.toLocaleString()}</span>
+									<span>$${roundToDollar(niit.threshold).toLocaleString()}</span>
 								</div>
 								<div class="breakdown-item">
 									<label>Excess:</label>
-									<span>$${niit.excess.toLocaleString()}</span>
+									<span>$${roundToDollar(niit.excess).toLocaleString()}</span>
 								</div>
 								<div class="breakdown-item">
 									<label>Net Investment Income:</label>
-									<span>$${niit.netInvestmentIncome.toLocaleString()}</span>
+									<span>$${roundToDollar(niit.netInvestmentIncome).toLocaleString()}</span>
 								</div>
 								<div class="breakdown-item bracket-item">
-									<label>$${Math.min(niit.netInvestmentIncome, niit.excess).toLocaleString()} × 3.8%:</label>
-									<span>$${niit.niitAmount.toLocaleString()}</span>
+									<label>$${roundToDollar(Math.min(niit.netInvestmentIncome, niit.excess)).toLocaleString()} × 3.8%:</label>
+									<span>$${roundToDollar(niit.niitAmount).toLocaleString()}</span>
 								</div>
 							</div>
 						</div>
@@ -726,6 +873,16 @@ export class UIManager {
 				if (newResultsGrid) {
 					resultsGrid.innerHTML = newResultsGrid.innerHTML
 				}
+			}
+		}
+
+		// Also update floating HUD if it's currently showing this scenario
+		const hudContainer = document.getElementById('floating-results-hud')
+		if (hudContainer && hudContainer.style.display !== 'none') {
+			// Check if the currently focused input belongs to this scenario
+			const activeElement = document.activeElement as HTMLInputElement
+			if (activeElement && activeElement.dataset.id === scenarioId) {
+				hudContainer.innerHTML = this.renderFloatingResults(scenario)
 			}
 		}
 	}
