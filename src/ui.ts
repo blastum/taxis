@@ -272,6 +272,21 @@ export class UIManager {
 				</div>
 				
 				<div class="input-group">
+					<label>IRA/401K Distributions:</label>
+					<input type="text" data-field="ira401kDistributions" data-id="${scenario.id}" value="${scenario.inputs.ira401kDistributions}" placeholder="Enter amount">
+				</div>
+				
+				<div class="input-group">
+					<label>Pension Income:</label>
+					<input type="text" data-field="pensionIncome" data-id="${scenario.id}" value="${scenario.inputs.pensionIncome}" placeholder="Enter amount">
+				</div>
+				
+				<div class="input-group">
+					<label>Social Security Income:</label>
+					<input type="text" data-field="socialSecurityIncome" data-id="${scenario.id}" value="${scenario.inputs.socialSecurityIncome}" placeholder="Enter amount">
+				</div>
+				
+				<div class="input-group">
 					<label>Ordinary Earnings:</label>
 					<input type="text" data-field="ordinaryEarnings" data-id="${scenario.id}" value="${scenario.inputs.ordinaryEarnings}" placeholder="Enter amount">
 				</div>
@@ -587,6 +602,9 @@ export class UIManager {
 		const tabOrderSelectors = [
 			'.scenario-name',
 			'[data-field="ordinaryIncome"]',
+			'[data-field="ira401kDistributions"]',
+			'[data-field="pensionIncome"]',
+			'[data-field="socialSecurityIncome"]',
 			'[data-field="ordinaryEarnings"]',
 			'[data-field="longTermCapitalGains"]',
 			'[data-field="capitalLosses"]',

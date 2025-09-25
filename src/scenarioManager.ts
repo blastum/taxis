@@ -26,10 +26,20 @@ export class ScenarioManager {
 		if (stored) {
 			try {
 				this.scenarios = JSON.parse(stored)
-				// Handle backward compatibility: add taxYear if missing
+				// Handle backward compatibility: add missing fields
 				this.scenarios.forEach(scenario => {
 					if (!scenario.inputs.taxYear) {
 						scenario.inputs.taxYear = 2024
+					}
+					// Add new income fields if missing (for backward compatibility)
+					if (typeof scenario.inputs.ira401kDistributions === 'undefined') {
+						scenario.inputs.ira401kDistributions = 0
+					}
+					if (typeof scenario.inputs.pensionIncome === 'undefined') {
+						scenario.inputs.pensionIncome = 0
+					}
+					if (typeof scenario.inputs.socialSecurityIncome === 'undefined') {
+						scenario.inputs.socialSecurityIncome = 0
 					}
 					scenario.results = calculateTax(scenario.inputs)
 					scenario.detailedBreakdown = calculateDetailedTaxBreakdown(scenario.inputs)
@@ -51,6 +61,9 @@ export class ScenarioManager {
 				taxYear: 2024,
 				filingStatus: 'single',
 				ordinaryIncome: 0,
+				ira401kDistributions: 0,
+				pensionIncome: 0,
+				socialSecurityIncome: 0,
 				ordinaryEarnings: 0,
 				longTermCapitalGains: 0,
 				capitalLosses: 0,

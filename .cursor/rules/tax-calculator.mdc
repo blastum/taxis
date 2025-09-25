@@ -1,0 +1,73 @@
+---
+description: Pure tax calculation rules and constraints for TaxCalculator
+globs: ["src/taxCalculator.ts", "dist/taxCalculator.js"]
+alwaysApply: true
+---
+# Tax Calculator Component Rules
+
+## Component Purpose
+Pure calculation logic for US federal income tax calculations. This component contains NO UI code and focuses solely on tax computation algorithms.
+
+## File Location
+- **Source**: `src/taxCalculator.ts`
+- **Compiled**: `dist/taxCalculator.js`
+
+## Core Rules
+
+### 1. Pure Functions Only
+- **Rule**: All functions must be pure (no side effects)
+- **Rule**: Same input must always produce same output
+- **Rule**: No external dependencies except types from `types.ts`
+- **Rule**: No DOM manipulation, no localStorage, no UI code
+
+### 2. Tax Calculation Logic
+- **Rule**: Support single, MFJ, MFS filing statuses
+- **Rule**: Handle 2024 and 2025 tax years with automatic selection
+- **Rule**: Separate processing for ordinary income vs long-term capital gains
+- **Rule**: Apply standard deductions and senior additional deductions (65+)
+- **Rule**: Calculate NIIT (3.8%) with year-specific thresholds
+
+### 3. Key Functions
+- **`calculateTax(inputs: TaxInputs): TaxResults`**: Primary calculation function
+- **`calculateDetailedTaxBreakdown(inputs: TaxInputs): DetailedTaxBreakdown`**: Detailed breakdown for modal
+
+### 4. Tax Data Structure
+```typescript
+TAX_YEAR_DATA = {
+  [year: number]: {
+    standardDeductions: { [status: FilingStatus]: number }
+    seniorAdditionalDeduction: { [status: FilingStatus]: number }
+    taxBrackets: { [status: FilingStatus]: TaxBracket[] }
+    ltcgThresholds: { [status: FilingStatus]: LTCGThreshold[] }
+    niitThresholds: { [status: FilingStatus]: number }
+  }
+}
+```
+
+### 5. Calculation Rules
+- **Rule**: Apply capital losses against total income before deductions
+- **Rule**: Calculate taxable ordinary income after deductions
+- **Rule**: Stack long-term capital gains on top of ordinary taxable income
+- **Rule**: Apply progressive brackets to ordinary income
+- **Rule**: Apply LTCG rates (0%, 15%, 20%) to appropriate portions
+- **Rule**: Calculate NIIT on lesser of NII or MAGI excess over thresholds
+
+### 6. Error Handling
+- **Rule**: Return valid results even with invalid inputs (graceful degradation)
+- **Rule**: Use fallback values for missing or corrupted data
+- **Rule**: Never throw exceptions, always return calculable results
+
+### 7. Testing Requirements
+- **Rule**: All functions must be easily unit testable
+- **Rule**: Use known tax scenarios for validation
+- **Rule**: Test edge cases (zero income, maximum brackets, etc.)
+
+## Dependencies
+- **Allowed**: Only `types.ts` for type definitions
+- **Forbidden**: UI components, DOM APIs, localStorage, external libraries
+
+## When Adding New Features
+- **Rule**: Maintain pure function principles
+- **Rule**: Add comprehensive type definitions first
+- **Rule**: Update tax year data structure for new years
+- **Rule**: Test with official IRS examples

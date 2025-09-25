@@ -136,11 +136,14 @@ export function calculateTax(inputs: TaxInputs): TaxResults {
 	const capitalLossOffset = Math.min(netCapitalLosses, CAPITAL_LOSS_OFFSET_LIMIT)
 	const remainingCapitalLosses = netCapitalLosses - capitalLossOffset
 
+	// Sum all ordinary income components for federal tax calculations
+	const totalOrdinaryIncome = inputs.ordinaryIncome + inputs.ira401kDistributions + inputs.pensionIncome + inputs.socialSecurityIncome
+
 	// Gross components after capital loss offset
-	const ordinaryGross = inputs.ordinaryIncome + inputs.ordinaryEarnings - capitalLossOffset
+	const ordinaryGross = totalOrdinaryIncome + inputs.ordinaryEarnings - capitalLossOffset
 
 	// Total income calculation (only subtract the actual offset, not all losses)
-	const totalIncome = inputs.ordinaryIncome + inputs.ordinaryEarnings + netCapitalGains - capitalLossOffset
+	const totalIncome = totalOrdinaryIncome + inputs.ordinaryEarnings + netCapitalGains - capitalLossOffset
 	const taxableIncome = Math.max(0, totalIncome - totalDeductions)
 
 	// Allocate deductions first to ordinary income, then to LTCG
@@ -162,7 +165,7 @@ export function calculateTax(inputs: TaxInputs): TaxResults {
 	const capitalGainsTax = zeroPortion * 0 + fifteenPortion * 0.15 + twentyPortion * 0.20
 
 	// NIIT (3.8%) - calculated on gross amounts before capital loss offset
-	const magiApprox = (inputs.ordinaryIncome + inputs.ordinaryEarnings) + netCapitalGains
+	const magiApprox = totalOrdinaryIncome + inputs.ordinaryEarnings + netCapitalGains
 	const netInvestmentIncome = Math.max(0, inputs.ordinaryEarnings) + netCapitalGains
 	const niitThreshold = taxData.niitThresholds[inputs.filingStatus]
 	const niitExcess = Math.max(0, magiApprox - niitThreshold)
@@ -201,9 +204,12 @@ export function calculateDetailedTaxBreakdown(inputs: TaxInputs): DetailedTaxBre
 	const capitalLossOffset = Math.min(netCapitalLosses, CAPITAL_LOSS_OFFSET_LIMIT)
 	const remainingCapitalLosses = netCapitalLosses - capitalLossOffset
 
+	// Sum all ordinary income components for federal tax calculations
+	const totalOrdinaryIncome = inputs.ordinaryIncome + inputs.ira401kDistributions + inputs.pensionIncome + inputs.socialSecurityIncome
+
 	// Gross components after capital loss offset
-	const ordinaryGross = inputs.ordinaryIncome + inputs.ordinaryEarnings - capitalLossOffset
-	const totalStandardIncome = inputs.ordinaryIncome + inputs.ordinaryEarnings
+	const ordinaryGross = totalOrdinaryIncome + inputs.ordinaryEarnings - capitalLossOffset
+	const totalStandardIncome = totalOrdinaryIncome + inputs.ordinaryEarnings
 
 	// Allocate deductions first to ordinary income, then to LTCG
 	const ordinaryTaxable = Math.max(0, ordinaryGross - totalDeductions)
@@ -241,7 +247,7 @@ export function calculateDetailedTaxBreakdown(inputs: TaxInputs): DetailedTaxBre
 	const twentyPortion = Math.max(0, remainingLTCG)
 
 	// NIIT detailed calculation - calculated on gross amounts before capital loss offset
-	const magiApprox = (inputs.ordinaryIncome + inputs.ordinaryEarnings) + netCapitalGains
+	const magiApprox = totalOrdinaryIncome + inputs.ordinaryEarnings + netCapitalGains
 	const netInvestmentIncome = Math.max(0, inputs.ordinaryEarnings) + netCapitalGains
 	const niitThreshold = taxData.niitThresholds[inputs.filingStatus]
 	const niitExcess = Math.max(0, magiApprox - niitThreshold)

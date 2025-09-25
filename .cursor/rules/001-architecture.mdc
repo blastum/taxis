@@ -1,0 +1,68 @@
+---
+description: Core architecture rules and component responsibilities for Taxis
+globs: ["src/**/*.ts", "dist/**/*.js"]
+alwaysApply: true
+---
+# Taxis Project Architecture Rules
+
+## Project Overview
+Taxis is a web-based tax calculation application for US federal income taxes (2024 tax year). It allows users to create and manage multiple tax scenarios to compare different financial situations.
+
+## Core Architecture Principles
+- **Separation of Concerns**: Each component has a single responsibility
+- **Pure Functions**: Tax calculations are stateless and deterministic  
+- **Type Safety**: Full TypeScript coverage with strict typing
+- **Real-time Updates**: UI immediately reflects calculation changes
+- **Data Persistence**: All scenarios automatically saved to localStorage
+- **Accessibility**: Intelligent tab navigation and focus management
+
+## Component Responsibilities
+
+### TaxCalculator (`src/taxCalculator.ts`)
+- **Purpose**: Pure calculation logic for US federal income tax
+- **Key Functions**: `calculateTax()`, `calculateDetailedTaxBreakdown()`
+- **Features**: Support for single/MFJ/MFS, 2024/2025 tax years, LTCG stacking, NIIT calculation
+- **Dependencies**: Only uses types from `types.ts`, no UI dependencies
+- **Rule**: NEVER add UI code or DOM manipulation to this component
+
+### ScenarioManager (`src/scenarioManager.ts`) 
+- **Purpose**: Data management and persistence layer
+- **Key Methods**: `createScenario()`, `updateScenario()`, `updateScenarioSilently()`, `deleteScenario()`, `duplicateScenario()`
+- **Features**: CRUD operations, localStorage persistence, observer pattern, automatic tax recalculation
+- **Dependencies**: Uses TaxCalculator for calculations, provides observer pattern for UI updates
+- **Rule**: Always use observer pattern for UI updates, never directly manipulate DOM
+
+### UIManager (`src/ui.ts`)
+- **Purpose**: User interface and interaction handling  
+- **Key Features**: Dynamic scenario rendering, intelligent tab navigation, real-time updates, focus preservation
+- **Tab Order**: Scenario Name → Ordinary Income → Ordinary Earnings → LTCG → Capital Losses → 65+ → cycles back
+- **Event Handling**: Debounced text inputs (150ms), immediate checkbox/select updates
+- **Dependencies**: Uses ScenarioManager for data operations
+- **Rule**: Always preserve focus during real-time updates using `updateScenarioSilently()`
+
+### Types (`src/types.ts`)
+- **Purpose**: TypeScript type definitions
+- **Key Types**: `FilingStatus`, `TaxInputs`, `TaxResults`, `TaxScenario`, `DetailedTaxBreakdown`
+- **Rule**: All data structures must be strictly typed, no `any` types allowed
+
+## Data Flow Rules
+1. User Input → UIManager → ScenarioManager → TaxCalculator → Results → UI Update
+2. All changes automatically persisted to localStorage
+3. Observer pattern notifies UI of changes
+4. Focus preservation during real-time updates using `updateScenarioSilently()`
+5. **Rule**: Never bypass the data flow, always go through ScenarioManager for data changes
+
+## Technical Stack
+- **Language**: TypeScript with strict typing
+- **Build**: TypeScript compiler with source maps  
+- **Runtime**: Browser ES modules
+- **Storage**: localStorage for persistence
+- **Development**: Python HTTP server on port 8000
+
+## Key Implementation Rules
+- **Focus Preservation**: Configurable via `uiManager.setFocusPreservation(true/false)`
+- **Debounced Updates**: Text inputs use 150ms debounce, checkboxes/selects update immediately
+- **Tax Year Data**: Year-based structure in `TAX_YEAR_DATA` with automatic selection
+- **NIIT Calculation**: 3.8% tax with year-specific thresholds by filing status
+- **Capital Gains Stacking**: LTCG stack on top of ordinary taxable income
+- **Rule**: Always maintain backward compatibility when adding new tax years

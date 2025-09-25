@@ -1,0 +1,98 @@
+---
+description: Data flow, observer pattern, and persistence rules for Taxis
+globs: ["src/scenarioManager.ts", "dist/scenarioManager.js"]
+alwaysApply: true
+---
+# Data Flow and Persistence Rules
+
+## Component Purpose
+Data management and persistence layer using observer pattern for UI updates.
+
+## File Location
+- **Source**: `src/scenarioManager.ts`
+- **Compiled**: `dist/scenarioManager.js`
+
+## Core Data Management Rules
+
+### 1. Observer Pattern Implementation
+- **Rule**: Use observer pattern for all UI updates
+- **Rule**: Never directly manipulate DOM from ScenarioManager
+- **Rule**: Always notify listeners when scenarios change
+- **Rule**: Decouple data layer from UI layer completely
+
+### 2. CRUD Operations
+- **`createScenario()`**: Creates new scenario with default values, returns ID
+- **`updateScenario(id, inputs)`**: Updates inputs and recalculates taxes, triggers full UI re-render
+- **`updateScenarioSilently(id, inputs)`**: Updates without full re-render (for focus preservation)
+- **`deleteScenario(id)`**: Removes scenario from storage and notifies listeners
+- **`duplicateScenario(id)`**: Creates copy with new name, returns new ID
+- **Rule**: All operations must persist to localStorage immediately
+
+### 3. Automatic Tax Recalculation
+- **Rule**: Always recalculate taxes when inputs change
+- **Rule**: Use TaxCalculator for all calculations
+- **Rule**: Store results in scenario object
+- **Rule**: Trigger observer notifications after recalculation
+
+### 4. localStorage Persistence
+- **Key**: `taxis-scenarios`
+- **Format**: JSON array of TaxScenario objects
+- **Rule**: All changes automatically saved to localStorage
+- **Rule**: Graceful handling of corrupted localStorage data
+- **Rule**: Default to empty array if localStorage is empty or invalid
+
+### 5. Data Structure Rules
+```typescript
+interface TaxScenario {
+  id: string
+  name: string
+  inputs: TaxInputs
+  results: TaxResults
+  lastUpdated: Date
+}
+```
+- **Rule**: Each scenario must have unique ID
+- **Rule**: Always include timestamp for lastUpdated
+- **Rule**: Maintain data integrity across all operations
+
+### 6. Focus Preservation Strategy
+- **Rule**: Use `updateScenarioSilently()` for text input fields
+- **Rule**: Use `updateScenario()` for checkbox/select fields
+- **Rule**: Silent updates don't trigger full UI re-render
+- **Rule**: Manual UI updates for results display only
+
+### 7. Error Handling Rules
+- **Rule**: Graceful handling of invalid scenario data
+- **Rule**: Fallback to previous valid results on calculation errors
+- **Rule**: Never crash application due to data corruption
+- **Rule**: Log errors for debugging but maintain functionality
+
+### 8. Event Handling
+- **Rule**: Add listeners with `addListener(callback)`
+- **Rule**: Remove listeners with `removeListener(callback)`
+- **Rule**: Callbacks receive updated scenarios array
+- **Rule**: Support multiple listeners for different UI components
+
+### 9. Performance Rules
+- **Rule**: Only recalculate when inputs actually change
+- **Rule**: Efficient change detection to avoid unnecessary calculations
+- **Rule**: Debounced updates for rapid input changes
+- **Rule**: Batch localStorage writes when possible
+
+### 10. Data Validation
+- **Rule**: Validate input data before processing
+- **Rule**: Sanitize data before storage
+- **Rule**: Maintain type safety throughout data flow
+- **Rule**: Handle edge cases gracefully
+
+## Dependencies
+- **TaxCalculator**: For all tax calculations
+- **Types**: Uses TaxInputs, TaxResults, TaxScenario types
+- **localStorage**: Browser storage API
+
+## When Modifying Data Layer
+- **Rule**: Always maintain observer pattern
+- **Rule**: Test localStorage persistence after changes
+- **Rule**: Verify automatic recalculation works
+- **Rule**: Check error handling with invalid data
+- **Rule**: Ensure backward compatibility with existing data

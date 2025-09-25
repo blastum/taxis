@@ -5,6 +5,9 @@ export interface TaxInputs {
 	taxYear: TaxYear
 	filingStatus: FilingStatus
 	ordinaryIncome: number
+	ira401kDistributions: number
+	pensionIncome: number
+	socialSecurityIncome: number
 	ordinaryEarnings: number
 	longTermCapitalGains: number
 	capitalLosses: number

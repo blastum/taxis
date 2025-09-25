@@ -206,6 +206,17 @@ body {
 	text-align: right;
 }
 
+/* Right-align all income-related text inputs */
+.input-group input[data-field="ordinaryIncome"],
+.input-group input[data-field="ira401kDistributions"],
+.input-group input[data-field="pensionIncome"],
+.input-group input[data-field="socialSecurityIncome"],
+.input-group input[data-field="ordinaryEarnings"],
+.input-group input[data-field="longTermCapitalGains"],
+.input-group input[data-field="capitalLosses"] {
+	text-align: right;
+}
+
 .input-group input.invalid {
 	border-color: #ff6b6b;
 	background-color: rgba(255, 107, 107, 0.1);

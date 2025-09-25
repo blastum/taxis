@@ -1,0 +1,87 @@
+---
+description: UI patterns, tab navigation, focus management, and accessibility rules
+globs: ["src/ui.ts", "dist/ui.js", "styles.css"]
+alwaysApply: true
+---
+# UI Patterns and Accessibility Rules
+
+## Component Purpose
+User interface and interaction handling with focus on accessibility and user experience.
+
+## File Location
+- **Source**: `src/ui.ts`
+- **Compiled**: `dist/ui.js`
+
+## Core UI Rules
+
+### 1. Tab Navigation System
+- **Rule**: Implement sequential `tabIndex` assignment for predictable flow
+- **Rule**: Filing status excluded from tab navigation (tabIndex = -1)
+- **Rule**: Tab order: Scenario Name → Ordinary Income → Ordinary Earnings → LTCG → Capital Losses → 65+ → cycles back to Ordinary Income
+- **Rule**: Always preserve tab order during re-renders
+
+### 2. Focus Management
+- **Rule**: Automatically focus on Ordinary Income field when app loads
+- **Rule**: All input fields select their contents when focused for easy replacement
+- **Rule**: Preserve focus during real-time updates using `updateScenarioSilently()`
+- **Rule**: Never lose focus during typing or calculations
+
+### 3. Real-time Updates
+- **Rule**: Text inputs use 150ms debounce to prevent excessive calculations
+- **Rule**: Checkboxes and select dropdowns update immediately on change
+- **Rule**: Use `updateScenarioSilently()` for text inputs to preserve focus
+- **Rule**: Use normal `updateScenario()` for checkboxes/selects (triggers re-render)
+
+### 4. Event Handling Strategy
+- **Checkbox Fields**: Use `change` event for immediate updates
+- **Select Fields**: Use `change` event for immediate updates (triggers re-rendering)
+- **Text/Number Fields**: Use `input` event with 150ms debouncing
+- **Rule**: Never interfere with tab navigation during event handling
+
+### 5. Conditional Field Rendering
+- **Rule**: Seniors field renders as checkbox for Single/MFS, number input (0-2) for MFJ
+- **Rule**: Field type changes immediately when filing status changes
+- **Rule**: Handle different input types appropriately (text, number, checkbox, select)
+
+### 6. Form Layout Rules
+- **Rule**: Use compact inline form layout (labels next to inputs)
+- **Rule**: Maintain consistent spacing and alignment
+- **Rule**: Right-align numeric values with 100px minimum width
+- **Rule**: Show visual alignment guide (1px line, 8% opacity) 100px from right edge
+
+### 7. Modal System
+- **Rule**: Detailed breakdown modal uses glassmorphism design with backdrop blur
+- **Rule**: ESC key closes modal
+- **Rule**: Click outside modal closes modal
+- **Rule**: Smooth animations for modal open/close
+- **Rule**: Mobile-optimized modal layout
+
+### 8. Accessibility Requirements
+- **Rule**: Full keyboard navigation support
+- **Rule**: Screen reader compatible semantic HTML
+- **Rule**: Proper ARIA labels and roles
+- **Rule**: High contrast text for readability
+- **Rule**: Focus indicators visible and clear
+
+### 9. Responsive Design
+- **Rule**: Touch-friendly interface for mobile devices
+- **Rule**: Flexible layout that adapts to different screen sizes
+- **Rule**: Maintain usability across all device types
+
+### 10. Error Handling
+- **Rule**: Graceful handling of invalid input data
+- **Rule**: Clear error messages and validation feedback
+- **Rule**: Prevent form submission with invalid data
+- **Rule**: Maintain UI state during error conditions
+
+## Configuration Options
+- **Focus Preservation**: Configurable via `uiManager.setFocusPreservation(true/false)`
+- **Default**: Focus preservation enabled for better user experience
+- **Debugging**: Can be disabled to troubleshoot focus issues
+
+## When Modifying UI
+- **Rule**: Always test tab navigation after changes
+- **Rule**: Verify focus preservation during real-time updates
+- **Rule**: Check accessibility with keyboard-only navigation
+- **Rule**: Test on mobile devices for responsive behavior
+- **Rule**: Maintain consistent visual design system
